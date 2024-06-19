@@ -82,7 +82,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>"C:\Users\HP\Documents\SFML-2.6.1-windows-vc17-64-bit\SFML-2.6.1\lib";C:\Users\HP\Documents\SFML-2.6.1-windows-vc17-64-bit\SFML-2.6.1\library</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);sfml-graphics-d.lib; sfml-window-d.lib; sfml-system-d.lib; sfml-audio-d.lib;"C:\Users\HP\Documents\SFML-2.6.1-windows-vc17-64-bit\SFML-2.6.1\lib\sfml-system-s-d.lib"</AdditionalDependencies>
+      <AdditionalDependencies>sfml-graphics-d.lib; sfml-window-d.lib; sfml-system-d.lib; sfml-audio-d.lib;$(CoreLibraryDependencies);%(AdditionalDependencies);sfml-graphics-d.lib; sfml-window-d.lib; sfml-system-d.lib; sfml-audio-d.lib;"C:\Users\HP\Documents\SFML-2.6.1-windows-vc17-64-bit\SFML-2.6.1\lib\sfml-system-s-d.lib"</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -101,7 +101,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>"C:\Users\HP\Documents\SFML-2.6.1-windows-vc17-64-bit\SFML-2.6.1\lib";"C:\Users\HP\Documents\SFML-2.6.1-windows-vc17-64-bit\SFML-2.6.1\lib"</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);winmm.lib; opengl32.lib; freetype.lib; sfml-graphics-s.lib; sfml-window-s.lib; sfml-system-s.lib; sfml-audio-s.lib;</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib; opengl32.lib; freetype.lib; sfml-graphics-s.lib; sfml-window-s.lib; sfml-system-s.lib; sfml-audio-s.lib;$(CoreLibraryDependencies);%(AdditionalDependencies);winmm.lib; opengl32.lib; freetype.lib; sfml-graphics-d.lib; sfml-window-s.lib; sfml-system-d.lib; sfml-audio-d.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -116,7 +116,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>"C:\Users\HP\Documents\SFML-2.6.1-windows-vc17-64-bit\SFML-2.6.1\lib";C:\Users\HP\Documents\SFML-2.6.1-windows-vc17-64-bit\SFML-2.6.1\library</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);sfml-graphics-d.lib; sfml-window-d.lib; sfml-system-d.lib; sfml-audio-d.lib;"C:\Users\HP\Documents\SFML-2.6.1-windows-vc17-64-bit\SFML-2.6.1\lib\sfml-system-s-d.lib"</AdditionalDependencies>
+      <AdditionalDependencies>sfml-graphics-d.lib; sfml-window-d.lib; sfml-system-d.lib; sfml-audio-d.lib;$(CoreLibraryDependencies);%(AdditionalDependencies);sfml-graphics-s.lib; sfml-window-s.lib; sfml-system-s.lib; sfml-audio-s.lib;"C:\Users\HP\Documents\SFML-2.6.1-windows-vc17-64-bit\SFML-2.6.1\lib\sfml-system-s-d.lib"</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,11 +135,25 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>"C:\Users\HP\Documents\SFML-2.6.1-windows-vc17-64-bit\SFML-2.6.1\lib";"C:\Users\HP\Documents\SFML-2.6.1-windows-vc17-64-bit\SFML-2.6.1\lib"</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);winmm.lib; opengl32.lib; freetype.lib; sfml-graphics-s.lib; sfml-window-s.lib; sfml-system-s.lib; sfml-audio-s.lib;</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib; opengl32.lib; freetype.lib; sfml-graphics-s.lib; sfml-window-s.lib; sfml-system-s.lib; sfml-audio-s.lib;$(CoreLibraryDependencies);%(AdditionalDependencies);winmm.lib; opengl32.lib; freetype.lib; sfml-graphics-d.lib; sfml-window-d.lib; sfml-system-d.lib; sfml-audio-d.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="snake.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="game.hpp" />
+    <ClInclude Include="item.hpp" />
+    <ClInclude Include="snake.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="images\Sansation.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="images\texture.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
