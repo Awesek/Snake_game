@@ -2,6 +2,7 @@
 
 #include "SFML/Graphics.hpp"
 #include "SFML/System.hpp"
+#include <vector>
 
 class Snake;
 class Item;
@@ -36,8 +37,36 @@ private:
 
     bool isPaused;
     bool isGameOver;
+    bool inMenu;
+
+    int currentLevel;
+
+    std::vector<sf::RectangleShape> obstacles;
+    std::vector<sf::RectangleShape> menuButtons;
+    std::vector<sf::Text> menuButtonLabels;
+
+    sf::Texture backgroundTexture;
+    sf::Sprite backgroundSprite;
+
+    sf::Clock playClock;
+    sf::Text playTimeText;
+    bool gameStarted;
 
     void checkCollisions();
     void resetGame();
     void handleInput();
+    void handleMenuInput();
+    void drawMenu();
+    void drawObstacles();
+    void increaseDifficulty();
+    void loadMap(int level);
+    void showMapDescription(int level);
+
+    sf::RectangleShape playButton;
+    sf::Text playButtonLabel;
+    sf::Text mapDescription;
+
+    sf::Clock timeLimitClock;
+    sf::Text timeLimitText;
+    int timeLimit;
 };

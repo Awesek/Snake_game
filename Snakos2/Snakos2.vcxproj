@@ -153,6 +153,7 @@
     <Font Include="images\Sansation.ttf" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="images\background.png" />
     <Image Include="images\texture.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

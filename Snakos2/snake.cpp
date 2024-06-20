@@ -1,7 +1,7 @@
 #include "snake.hpp"
 #include "game.hpp"
 
-Snake::Snake() : direction(UP), timeAcummulator(0.f), step(0.2f), snakeLength(4), score(0)
+Snake::Snake() : direction(UP), timeAcummulator(0.f), step(0.1f), snakeLength(4), score(0)
 {
     sf::Vector2f initialPos = Game::getRandomPosition();
 
@@ -21,7 +21,7 @@ Snake::Snake() : direction(UP), timeAcummulator(0.f), step(0.2f), snakeLength(4)
     bodyPart.setTextureRect(rect);
 
     for (int i = 0; i <= snakeLength; i++)
-        snakeParts.emplace_back(initialPos.x, initialPos.y + (i * Game::SCALE * Game::TILESIZE));
+        snakeParts.emplace_back(initialPos.x, initialPos.y + static_cast<float>(i * Game::SCALE * Game::TILESIZE));
 }
 
 Snake::~Snake()
@@ -39,7 +39,7 @@ void Snake::changeDirection(DIRECTION d)
 
 void Snake::grabbedItem()
 {
-    score += 5;
+    score += 1;
     sf::Vector2f pos = snakeParts[snakeLength];
 
     for (int i = snakeLength + 1; i <= snakeLength + 3; i++)
@@ -69,6 +69,21 @@ bool Snake::checkCollisionWithEdges()
     if (snakeHeadPos.x < 0 || snakeHeadPos.x > Game::GAMEWIDTH || snakeHeadPos.y < 0 || snakeHeadPos.y > Game::GAMEHEIGHT)
         return true;
     return false;
+}
+
+void Snake::increaseSpeed()
+{
+    step *= 0.9f;
+}
+
+void Snake::reduceScore(int points)
+{
+    score -= points;
+    int partsToRemove = points * 3;
+    for (int i = 0; i < partsToRemove && !snakeParts.empty(); ++i) {
+        snakeParts.pop_back();
+        --snakeLength;
+    }
 }
 
 void Snake::update(float secondsElapsed)

@@ -4,107 +4,321 @@
 
 #include <iostream>
 
-Game::Game() : currentEvent()
-{
-	srand((unsigned)time(NULL));
-
-	mainWindow = new sf::RenderWindow();
-
-	commonTexture.loadFromFile("images/texture.png");
-
-	snake = new Snake();
-	item = new Item();
-
-
-	font.loadFromFile("images/Sansation.ttf");
-
-	textOnScreen.setFont(font);
-	textOnScreen.setCharacterSize(24);
-	textOnScreen.setFillColor(sf::Color::Red);
-	textOnScreen.setPosition(32, mainWindow->getSize().y / 2);
-}
-
-Game::~Game()
-{
-	delete snake;
-	delete mainWindow;
-}
-
-void Game::start()
-{
-	mainWindow->create(sf::VideoMode(800, 600), "Nibbles", sf::Style::Titlebar);
-
-	// Game Loop
-	bool playing = true;
-	while (playing) {
-		deltaTime = deltaClock.restart();
-
-		while (mainWindow->pollEvent(currentEvent))
-		{
-			if (currentEvent.type == sf::Event::EventType::KeyPressed) {
-				if (currentEvent.key.code == sf::Keyboard::Escape)
-					playing = false;
-				else if (currentEvent.key.code == sf::Keyboard::Up)
-					snake->changeDirection(Snake::UP);
-				else if (currentEvent.key.code == sf::Keyboard::Down)
-					snake->changeDirection(Snake::DOWN);
-				else if (currentEvent.key.code == sf::Keyboard::Left)
-					snake->changeDirection(Snake::LEFT);
-				else if (currentEvent.key.code == sf::Keyboard::Right)
-					snake->changeDirection(Snake::RIGHT);
-			}
-		}
-
-		// update all
-		snake->update(deltaTime.asSeconds());
-		item->update();
-
-		checkCollisions();
-
-		if (snake->checkCollisionWithItself()) playing = false;
-		if (snake->checkCollisionWithEdges()) playing = false;
-
-		textOnScreen.setString("SCORE: " + snake->getScoreString() + "\t\t\tSNAKE LENGTH: " + snake->getLengthString());
-
-		// draw all
-		mainWindow->clear();
-		snake->draw(mainWindow);
-		item->draw(mainWindow);
-		mainWindow->draw(textOnScreen);
-		mainWindow->display();
-	}
-
-	mainWindow->close();
-}
-
-sf::Vector2f Game::getRandomPosition()
-{
-	int xPositions = GAMEWIDTH / (SCALE * TILESIZE);
-	int yPositions = GAMEHEIGHT / (SCALE * TILESIZE);
-
-	int x = rand() % xPositions;
-	int y = rand() % yPositions;
-
-	return sf::Vector2f(x * (SCALE * TILESIZE), y * (SCALE * TILESIZE));
-}
-
-void Game::checkCollisions()
-{
-	float finalSize = (TILESIZE * SCALE) / 2.f;
-
-	sf::Vector2f itemPos = item->getPosition();
-	sf::Vector2f snakeHeadPos = snake->getPosition();
-
-	// SNAKE HEAD WITH ITEM
-	if (std::abs(itemPos.x - snakeHeadPos.x) < finalSize
-		&& std::abs(itemPos.y - snakeHeadPos.y) < finalSize) {
-		item->setPosition(getRandomPosition());
-		snake->grabbedItem();
-	}
-}
-
 int Game::TILESIZE = 32;
 float Game::SCALE = 0.4f;
 float Game::GAMEWIDTH = 800;
 float Game::GAMEHEIGHT = 600;
 sf::Texture Game::commonTexture;
+
+Game::Game() : currentEvent(), isPaused(false), isGameOver(false), inMenu(true), gameStarted(false), currentLevel(0), timeLimit(10)
+{
+    srand(static_cast<unsigned>(time(NULL)));
+
+    mainWindow = new sf::RenderWindow(sf::VideoMode(800, 600), "Nibbles", sf::Style::Default);
+    mainWindow->setVerticalSyncEnabled(true);
+
+    commonTexture.loadFromFile("images/texture.png");
+
+    backgroundTexture.loadFromFile("images/background.png");
+    backgroundSprite.setTexture(backgroundTexture);
+    backgroundSprite.setPosition(0, 0);
+
+    snake = new Snake();
+    item = new Item();
+
+    font.loadFromFile("images/Sansation.ttf");
+
+    textOnScreen.setFont(font);
+    textOnScreen.setCharacterSize(24);
+    textOnScreen.setFillColor(sf::Color::Red);
+    textOnScreen.setPosition(32.f, static_cast<float>(mainWindow->getSize().y) / 2);
+
+    gameOverText.setFont(font);
+    gameOverText.setCharacterSize(48);
+    gameOverText.setFillColor(sf::Color::White);
+    gameOverText.setString("Game Over\nPress R to Restart");
+    gameOverText.setPosition(200.f, 250.f);
+
+    playTimeText.setFont(font);
+    playTimeText.setCharacterSize(24);
+    playTimeText.setFillColor(sf::Color::White);
+    playTimeText.setPosition(32.f, 32.f);
+
+    timeLimitText.setFont(font);
+    timeLimitText.setCharacterSize(24);
+    timeLimitText.setFillColor(sf::Color::Red);
+    timeLimitText.setPosition(600.f, 32.f);
+
+    mapDescription.setFont(font);
+    mapDescription.setCharacterSize(24);
+    mapDescription.setFillColor(sf::Color::White);
+    mapDescription.setPosition(50.f, 450.f);
+
+    playButton.setSize(sf::Vector2f(200.f, 50.f));
+    playButton.setPosition(300.f, 350.f);
+    playButton.setFillColor(sf::Color::Green);
+
+    playButtonLabel.setFont(font);
+    playButtonLabel.setString("Play");
+    playButtonLabel.setCharacterSize(24);
+    playButtonLabel.setFillColor(sf::Color::White);
+    playButtonLabel.setPosition(360.f, 360.f);
+
+    // Create menu buttons
+    for (int i = 0; i < 2; ++i) {
+        sf::RectangleShape button(sf::Vector2f(200.f, 50.f));
+        button.setPosition(300.f, 200.f + i * 70);
+        button.setFillColor(sf::Color::Blue);
+        menuButtons.push_back(button);
+
+        sf::Text label;
+        label.setFont(font);
+        label.setString("Map " + std::to_string(i + 1));
+        label.setCharacterSize(24);
+        label.setFillColor(sf::Color::White);
+        label.setPosition(340.f, 210.f + i * 70);
+        menuButtonLabels.push_back(label);
+    }
+}
+
+Game::~Game()
+{
+    delete snake;
+    delete item;
+    delete mainWindow;
+}
+
+void Game::start()
+{
+    bool playing = true;
+    while (playing) {
+        deltaTime = deltaClock.restart();
+
+        while (mainWindow->pollEvent(currentEvent))
+        {
+            if (currentEvent.type == sf::Event::Closed)
+                playing = false;
+
+            if (inMenu)
+                handleMenuInput();
+            else
+                handleInput();
+        }
+
+        if (inMenu) {
+            drawMenu();
+        }
+        else {
+            if (!isPaused && !isGameOver) {
+                if (!gameStarted) {
+                    gameStarted = true;
+                    playClock.restart();
+                    timeLimitClock.restart();
+                }
+
+                snake->update(deltaTime.asSeconds());
+                item->update();
+
+                checkCollisions();
+
+                if (snake->checkCollisionWithItself() || snake->checkCollisionWithEdges())
+                    isGameOver = true;
+
+                textOnScreen.setString("SCORE: " + snake->getScoreString() + "\t\t\tSNAKE LENGTH: " + snake->getLengthString());
+                textOnScreen.setPosition(0, 0);
+
+                sf::Time playTime = playClock.getElapsedTime();
+                playTimeText.setString("Time: " + std::to_string(static_cast<int>(playTime.asSeconds())) + "s");
+
+                if (currentLevel == 2) {
+                    sf::Time timeLimitTime = timeLimitClock.getElapsedTime();
+                    int timeLeft = timeLimit - static_cast<int>(timeLimitTime.asSeconds());
+                    timeLimitText.setString("Time Left: " + std::to_string(timeLeft) + "s");
+                    if (timeLeft <= 0) {
+                        snake->reduceScore(2);
+                        timeLimitClock.restart();
+                    }
+                    if (snake->getScore() < 0)
+                        isGameOver = true;
+                }
+            }
+
+            mainWindow->clear();
+            mainWindow->draw(backgroundSprite);  // Draw the background first
+            snake->draw(mainWindow);
+            item->draw(mainWindow);
+            drawObstacles();
+            mainWindow->draw(textOnScreen);
+            mainWindow->draw(playTimeText);
+            if (currentLevel == 2)
+                mainWindow->draw(timeLimitText);
+
+            if (isGameOver)
+                mainWindow->draw(gameOverText);
+
+            mainWindow->display();
+        }
+    }
+
+    mainWindow->close();
+}
+
+void Game::handleInput()
+{
+    if (currentEvent.type == sf::Event::KeyPressed) {
+        if (currentEvent.key.code == sf::Keyboard::Escape)
+            isPaused = !isPaused;
+        else if (currentEvent.key.code == sf::Keyboard::Up)
+            snake->changeDirection(Snake::UP);
+        else if (currentEvent.key.code == sf::Keyboard::Down)
+            snake->changeDirection(Snake::DOWN);
+        else if (currentEvent.key.code == sf::Keyboard::Left)
+            snake->changeDirection(Snake::LEFT);
+        else if (currentEvent.key.code == sf::Keyboard::Right)
+            snake->changeDirection(Snake::RIGHT);
+        else if (currentEvent.key.code == sf::Keyboard::R && isGameOver) {
+            playClock.restart();
+            timeLimitClock.restart();
+            resetGame();
+        }
+    }
+}
+
+void Game::handleMenuInput()
+{
+    if (currentEvent.type == sf::Event::MouseButtonPressed) {
+        if (currentEvent.mouseButton.button == sf::Mouse::Left) {
+            sf::Vector2i mousePos = sf::Mouse::getPosition(*mainWindow);
+            if (playButton.getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y)) && currentLevel != 0) {
+                inMenu = false;
+                loadMap(currentLevel);
+            }
+            else {
+                for (size_t i = 0; i < menuButtons.size(); ++i) {
+                    if (menuButtons[i].getGlobalBounds().contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y))) {
+                        currentLevel = static_cast<int>(i + 1);
+                        showMapDescription(currentLevel);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Game::drawMenu()
+{
+    mainWindow->clear();
+    for (auto& button : menuButtons)
+        mainWindow->draw(button);
+    for (auto& label : menuButtonLabels)
+        mainWindow->draw(label);
+    if (currentLevel != 0) {
+        mainWindow->draw(playButton);
+        mainWindow->draw(playButtonLabel);
+        mainWindow->draw(mapDescription);
+    }
+    mainWindow->display();
+}
+
+void Game::showMapDescription(int level)
+{
+    switch (level) {
+    case 1:
+        mapDescription.setString("Map 1: Obstacles spawn after every apple you eat.");
+        break;
+    case 2:
+        mapDescription.setString("Map 2: Map 1 + limited time to eat the next apple.");
+        break;
+    }
+}
+
+void Game::drawObstacles()
+{
+    for (auto& obstacle : obstacles)
+        mainWindow->draw(obstacle);
+}
+
+void Game::increaseDifficulty()
+{
+    snake->increaseSpeed();
+}
+
+void Game::loadMap(int level)
+{
+    currentLevel = level;
+    obstacles.clear();
+    // Define obstacles for each level
+    if (level == 1) {
+        // Add initial obstacles
+    }
+    else if (level == 2) {
+        // Add initial obstacles
+    }
+
+    // Start game
+    isPaused = false;
+    isGameOver = false;
+    resetGame();
+}
+
+sf::Vector2f Game::getRandomPosition()
+{
+    int xPositions = static_cast<int>(GAMEWIDTH / (SCALE * TILESIZE));
+    int yPositions = static_cast<int>(GAMEHEIGHT / (SCALE * TILESIZE));
+
+    sf::Vector2f position;
+    bool positionIsValid = false;
+
+    while (!positionIsValid) {
+        int x = rand() % xPositions;
+        int y = rand() % yPositions;
+        position = sf::Vector2f(static_cast<float>(x * (SCALE * TILESIZE)), static_cast<float>(y * (SCALE * TILESIZE)));
+
+        positionIsValid = true;
+       
+    }
+
+    return position;
+}
+
+void Game::checkCollisions()
+{
+    float finalSize = (TILESIZE * SCALE) / 2.f;
+
+    sf::Vector2f itemPos = item->getPosition();
+    sf::Vector2f snakeHeadPos = snake->getPosition();
+
+    if (std::abs(itemPos.x - snakeHeadPos.x) < finalSize && std::abs(itemPos.y - snakeHeadPos.y) < finalSize) {
+        item->setPosition(getRandomPosition());
+        snake->grabbedItem();
+
+        // Handle map-specific behavior
+        if (currentLevel == 1 || currentLevel == 2) {
+            // Map 1 and 2: Spawn obstacle after every apple
+            sf::RectangleShape newObstacle(sf::Vector2f(50.f, 50.f));
+            newObstacle.setPosition(getRandomPosition());
+            newObstacle.setFillColor(sf::Color::Blue);
+            obstacles.push_back(newObstacle);
+        }
+
+        if (currentLevel == 2) {
+            // Reset the time limit timer for Map 2
+            timeLimitClock.restart();
+        }
+    }
+
+    for (auto& obstacle : obstacles) {
+        if (obstacle.getGlobalBounds().intersects(snake->getHeadBounds())) {
+            isGameOver = true;
+        }
+    }
+}
+
+void Game::resetGame()
+{
+    delete snake;
+    snake = new Snake();
+    item->setPosition(getRandomPosition());
+    isGameOver = false;
+}
