@@ -1,9 +1,9 @@
 #include "snake.hpp"
 #include "game.hpp"
 
-Snake::Snake() : direction(UP), timeAcummulator(0.f), step(0.1f), snakeLength(4), score(0)
+Snake::Snake(const std::vector<sf::RectangleShape>& obstacles) : obstacles(obstacles), direction(UP), timeAcummulator(0.f), step(0.1f), snakeLength(4), score(0), speedBoostFactor(1.0f), speedBoostDuration(0.0f)
 {
-    sf::Vector2f initialPos = Game::getRandomPosition();
+    sf::Vector2f initialPos = Game::getRandomPosition(obstacles);
 
     head.setTexture(Game::commonTexture);
     sf::Rect<int> rect(sf::Vector2i(0, 0), sf::Vector2i(Game::TILESIZE, Game::TILESIZE));
@@ -71,9 +71,13 @@ bool Snake::checkCollisionWithEdges()
     return false;
 }
 
-void Snake::increaseSpeed()
+void Snake::increaseSpeed(float factor, float duration)
 {
-    step *= 0.9f;
+    step *= factor;
+    speedBoostFactor = factor;
+    speedBoostDuration = duration;
+    if (duration > 0.0f)
+        speedBoostClock.restart();
 }
 
 void Snake::reduceScore(int points)
@@ -88,6 +92,12 @@ void Snake::reduceScore(int points)
 
 void Snake::update(float secondsElapsed)
 {
+    if (speedBoostDuration > 0.0f && speedBoostClock.getElapsedTime().asSeconds() > speedBoostDuration) {
+        step /= speedBoostFactor;
+        speedBoostFactor = 1.0f;
+        speedBoostDuration = 0.0f;
+    }
+
     timeAcummulator += secondsElapsed;
     if (timeAcummulator < step)
         return;

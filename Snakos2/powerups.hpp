@@ -3,11 +3,13 @@
 #include "SFML/Graphics.hpp"
 #include <vector>
 
-class Item
+class PowerUp
 {
 public:
-    Item(const std::vector<sf::RectangleShape>& obstacles);
-    ~Item();
+    enum Type { SPEED_BOOST, EXTRA_POINTS };
+
+    PowerUp(Type type, const std::vector<sf::RectangleShape>& obstacles);
+    ~PowerUp();
 
     void update();
     void draw(sf::RenderWindow* window);
@@ -16,5 +18,6 @@ public:
 
 private:
     sf::Sprite sprite;
+    Type type;
     const std::vector<sf::RectangleShape>& obstacles;
 };

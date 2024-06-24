@@ -6,6 +6,7 @@
 
 class Snake;
 class Item;
+class PowerUp;
 
 class Game
 {
@@ -20,7 +21,7 @@ public:
     ~Game();
 
     void start();
-    static sf::Vector2f getRandomPosition();
+    static sf::Vector2f getRandomPosition(const std::vector<sf::RectangleShape>& obstacles);
 
 private:
     sf::RenderWindow* mainWindow;
@@ -30,6 +31,8 @@ private:
 
     Snake* snake;
     Item* item;
+    PowerUp* speedBoost;
+    PowerUp* extraPoints;
 
     sf::Font font;
     sf::Text textOnScreen;
@@ -61,6 +64,9 @@ private:
     void increaseDifficulty();
     void loadMap(int level);
     void showMapDescription(int level);
+    void resetObstacles();
+    void spawnPowerUps();
+    void handlePowerUpCollisions();
 
     sf::RectangleShape playButton;
     sf::Text playButtonLabel;
@@ -69,4 +75,10 @@ private:
     sf::Clock timeLimitClock;
     sf::Text timeLimitText;
     int timeLimit;
+
+    sf::Text pauseText;
+    sf::RectangleShape menuButton;
+    sf::Text menuButtonLabel;
+
+    sf::Clock powerUpSpawnClock;
 };
