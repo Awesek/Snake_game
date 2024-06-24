@@ -55,5 +55,11 @@
     <Image Include="images\background.png">
       <Filter>Soubory zdrojů</Filter>
     </Image>
+    <Image Include="images\extra_points.png">
+      <Filter>Soubory zdrojů</Filter>
+    </Image>
+    <Image Include="images\speed_boost.png">
+      <Filter>Soubory zdrojů</Filter>
+    </Image>
   </ItemGroup>
 </Project>
