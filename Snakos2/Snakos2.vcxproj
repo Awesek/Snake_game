@@ -142,13 +142,13 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="powerups.cpp" />
+    <ClCompile Include="powerup.cpp" />
     <ClCompile Include="snake.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.hpp" />
     <ClInclude Include="item.hpp" />
-    <ClInclude Include="powerups.hpp" />
+    <ClInclude Include="powerup.hpp" />
     <ClInclude Include="snake.hpp" />
   </ItemGroup>
   <ItemGroup>

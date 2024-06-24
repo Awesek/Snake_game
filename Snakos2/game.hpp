@@ -81,4 +81,5 @@ private:
     sf::Text menuButtonLabel;
 
     sf::Clock powerUpSpawnClock;
+    int powerUpSpawnInterval;
 };

@@ -8,7 +8,7 @@ class PowerUp
 public:
     enum Type { SPEED_BOOST, EXTRA_POINTS };
 
-    PowerUp(Type type, const std::vector<sf::RectangleShape>& obstacles);
+    PowerUp(Type type, const std::vector<sf::RectangleShape>& obstacles, const std::string& imagePath);
     ~PowerUp();
 
     void update();
@@ -18,6 +18,7 @@ public:
 
 private:
     sf::Sprite sprite;
+    sf::Texture texture;
     Type type;
     const std::vector<sf::RectangleShape>& obstacles;
 };

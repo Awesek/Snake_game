@@ -1,7 +1,7 @@
 #include "game.hpp"
 #include "snake.hpp"
 #include "item.hpp"
-#include "powerups.hpp"
+#include "powerup.hpp"
 
 #include <iostream>
 #include <cmath>
@@ -12,7 +12,7 @@ float Game::GAMEWIDTH = 800;
 float Game::GAMEHEIGHT = 600;
 sf::Texture Game::commonTexture;
 
-Game::Game() : currentEvent(), isPaused(false), isGameOver(false), inMenu(true), gameStarted(false), currentLevel(0), timeLimit(10)
+Game::Game() : currentEvent(), isPaused(false), isGameOver(false), inMenu(true), gameStarted(false), currentLevel(0), timeLimit(7)
 {
     srand(static_cast<unsigned>(time(NULL)));
 
@@ -27,8 +27,8 @@ Game::Game() : currentEvent(), isPaused(false), isGameOver(false), inMenu(true),
 
     snake = new Snake(obstacles);
     item = new Item(obstacles);
-    speedBoost = new PowerUp(PowerUp::SPEED_BOOST, obstacles);
-    extraPoints = new PowerUp(PowerUp::EXTRA_POINTS, obstacles);
+    speedBoost = new PowerUp(PowerUp::SPEED_BOOST, obstacles, "images/speed_boost.png");
+    extraPoints = new PowerUp(PowerUp::EXTRA_POINTS, obstacles, "images/extra_points.png");
 
     font.loadFromFile("images/Sansation.ttf");
 
@@ -102,6 +102,8 @@ Game::Game() : currentEvent(), isPaused(false), isGameOver(false), inMenu(true),
     menuButtonLabel.setCharacterSize(24);
     menuButtonLabel.setFillColor(sf::Color::White);
     menuButtonLabel.setPosition(360.f, 360.f);
+
+    powerUpSpawnInterval = 7 + rand() % 9; // Interval between 7 to 15 seconds
 }
 
 Game::~Game()
@@ -403,6 +405,8 @@ void Game::resetGame()
     extraPoints->setPosition(getRandomPosition(obstacles));
     playClock.restart();
     timeLimitClock.restart();
+    powerUpSpawnClock.restart();
+    powerUpSpawnInterval = 7 + rand() % 9;
     isGameOver = false;
     resetObstacles();
 }
@@ -415,9 +419,10 @@ void Game::resetObstacles()
 void Game::spawnPowerUps()
 {
     sf::Time elapsed = powerUpSpawnClock.getElapsedTime();
-    if (elapsed.asSeconds() > 6 + rand() % 10) {
+    if (elapsed.asSeconds() > powerUpSpawnInterval) {
         speedBoost->setPosition(getRandomPosition(obstacles));
         extraPoints->setPosition(getRandomPosition(obstacles));
         powerUpSpawnClock.restart();
+        powerUpSpawnInterval = 7 + rand() % 9; // Reset the interval
     }
 }

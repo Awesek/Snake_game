@@ -27,7 +27,7 @@
     <ClCompile Include="snake.cpp">
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
-    <ClCompile Include="powerups.cpp">
+    <ClCompile Include="powerup.cpp">
       <Filter>Zdrojové soubory</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,7 +41,7 @@
     <ClInclude Include="snake.hpp">
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
-    <ClInclude Include="powerups.hpp">
+    <ClInclude Include="powerup.hpp">
       <Filter>Hlavičkové soubory</Filter>
     </ClInclude>
   </ItemGroup>
