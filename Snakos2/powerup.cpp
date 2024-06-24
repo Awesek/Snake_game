@@ -10,7 +10,7 @@ PowerUp::PowerUp(Type type, const std::vector<sf::RectangleShape>& obstacles, co
 
     sf::FloatRect spriteSize = sprite.getLocalBounds();
     sprite.setOrigin(spriteSize.width / 2, spriteSize.height / 2);
-    sprite.setScale(Game::SCALE, Game::SCALE);
+    sprite.setScale(70.f / spriteSize.width, 65.f / spriteSize.height);
 
     sprite.setPosition(Game::getRandomPosition(obstacles));
 }

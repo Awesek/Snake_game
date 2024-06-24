@@ -380,18 +380,19 @@ void Game::checkCollisions()
 
 void Game::handlePowerUpCollisions()
 {
-    float finalSize = (TILESIZE * SCALE) / 2.f;
+    float hitboxWidth = 70.f * Game::SCALE;
+    float hitboxHeight = 65.f * Game::SCALE;
     sf::Vector2f snakeHeadPos = snake->getPosition();
 
     sf::Vector2f speedBoostPos = speedBoost->getPosition();
-    if (std::abs(speedBoostPos.x - snakeHeadPos.x) < finalSize && std::abs(speedBoostPos.y - snakeHeadPos.y) < finalSize) {
-        snake->increaseSpeed(1.35f, 3.0f);
+    if (std::abs(speedBoostPos.x - snakeHeadPos.x) < hitboxWidth && std::abs(speedBoostPos.y - snakeHeadPos.y) < hitboxHeight) {
+        snake->increaseSpeed(0.65f, 3.0f);  // Increase speed by 60% for 3 seconds
         speedBoost->setPosition(getRandomPosition(obstacles));
     }
 
     sf::Vector2f extraPointsPos = extraPoints->getPosition();
-    if (std::abs(extraPointsPos.x - snakeHeadPos.x) < finalSize && std::abs(extraPointsPos.y - snakeHeadPos.y) < finalSize) {
-        snake->increaseScore(3);
+    if (std::abs(extraPointsPos.x - snakeHeadPos.x) < hitboxWidth && std::abs(extraPointsPos.y - snakeHeadPos.y) < hitboxHeight) {
+        snake->grabExtraPoints();  // Increase score and length
         extraPoints->setPosition(getRandomPosition(obstacles));
     }
 }

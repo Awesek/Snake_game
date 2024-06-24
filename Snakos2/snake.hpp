@@ -13,6 +13,7 @@ public:
 
     void changeDirection(DIRECTION d);
     void grabbedItem();
+    void grabExtraPoints(); // New method
     bool checkCollisionWithItself();
     bool checkCollisionWithEdges();
     std::string getScoreString() const { return std::to_string(score); }

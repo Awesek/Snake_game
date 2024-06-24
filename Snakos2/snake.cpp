@@ -27,6 +27,16 @@ Snake::Snake(const std::vector<sf::RectangleShape>& obstacles) : obstacles(obsta
 Snake::~Snake()
 {
 }
+void Snake::grabExtraPoints()
+{
+    score += 3;
+    sf::Vector2f pos = snakeParts[snakeLength];
+
+    for (int i = snakeLength + 1; i <= snakeLength + 6; i++)
+        snakeParts.emplace_back(pos);
+
+    snakeLength += 6;
+}
 
 void Snake::changeDirection(DIRECTION d)
 {
